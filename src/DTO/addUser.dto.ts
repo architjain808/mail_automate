@@ -30,7 +30,7 @@ export class AddUserDto {
   mail_subject: string;
 
   @IsString()
-  @MaxLength(700)
+  @MaxLength(1500)
   @MinLength(3)
   @IsNotEmpty()
   @ApiProperty({ example: 'Email Subject' })

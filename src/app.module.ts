@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { MailService } from './services/mail.service';
 import { ConfigModule } from '@nestjs/config';
 import { UserManageService } from './services/usermanage.service';
+import { AesService } from './services/enc-dec.service';
 
 @Module({
   imports: [
@@ -22,6 +23,6 @@ import { UserManageService } from './services/usermanage.service';
     ConfigModule.forRoot(),
   ],
   controllers: [AppController],
-  providers: [AppService, MailService,UserManageService],
+  providers: [AppService, MailService, UserManageService, AesService],
 })
 export class AppModule {}

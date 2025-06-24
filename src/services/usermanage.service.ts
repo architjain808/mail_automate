@@ -1,9 +1,13 @@
-import { UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import * as fs from 'fs';
 import { AddUserDto } from 'src/DTO/addUser.dto';
 import { Users } from 'src/interface/users';
+import { AesService } from './enc-dec.service';
 
+@Injectable()
 export class UserManageService {
+  constructor(private readonly aesService: AesService) {}
+
   addUser(userdata: AddUserDto) {
     const rawData = JSON.parse(
       fs.readFileSync('./src/Data/users.json', 'utf-8'),
@@ -17,7 +21,7 @@ export class UserManageService {
     }
     rawData.push({
       useremail: userdata?.user_email,
-      appPassword: userdata?.user_email,
+      appPassword: this.aesService.encrypt(userdata?.user_app_password),
       subject: userdata?.user_email,
       text: userdata?.user_email,
       mailIndex: 0,

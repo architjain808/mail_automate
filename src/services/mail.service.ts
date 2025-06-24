@@ -6,9 +6,12 @@ import { Users } from 'src/interface/users';
 import { Recruiter } from 'src/interface/recruiter';
 import { console } from 'inspector';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { AesService } from './enc-dec.service';
 @Injectable()
 export class MailService {
   private readonly logger = new Logger(MailService.name);
+
+  constructor(private aesService: AesService) {}
 
   @Cron(CronExpression.MONDAY_TO_FRIDAY_AT_11AM)
   async handleEmailSend() {
@@ -18,7 +21,7 @@ export class MailService {
     const allRecuretors: Recruiter[] = JSON.parse(
       fs.readFileSync('./src/Data/allmails.json', 'utf-8'),
     );
-    allUsers.forEach((user) => {
+    for (const user of allUsers) {
       const mailStatingIndex = user?.mailIndex;
 
       const filteredList = allRecuretors.filter(
@@ -29,17 +32,18 @@ export class MailService {
         service: 'gmail',
         auth: {
           user: user?.useremail,
-          pass: user?.appPassword,
+          pass: this.aesService.decrypt(user?.appPassword),
         },
       });
-      this.sendEmailsOneByOne(user, userTranspoter, finalMailArray);
+      await this.sendEmailsOneByOne(user, userTranspoter, finalMailArray);
       this.updateUserFile(
         './src/Data/users.json',
         user?.useremail,
         'mailIndex',
         +user?.mailIndex + 20,
+        
       );
-    });
+    }
   }
 
   async sendEmailsOneByOne(
