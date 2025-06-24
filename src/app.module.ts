@@ -9,17 +9,17 @@ import { AesService } from './services/enc-dec.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([]),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres', // your PostgreSQL username
-      password: 'A90@j09#', // your PostgreSQL password
-      database: 'practise_nest', // name of the DB you just created
-      autoLoadEntities: true,
-      synchronize: true, // use true in dev only!
-    }),
+    // TypeOrmModule.forFeature([]),
+    // TypeOrmModule.forRoot({
+    //   type: 'postgres',
+    //   host: 'localhost',
+    //   port: 5432,
+    //   username: 'postgres', // your PostgreSQL username
+    //   password: 'A90@j09#', // your PostgreSQL password
+    //   database: 'practise_nest', // name of the DB you just created
+    //   autoLoadEntities: true,
+    //   synchronize: true, // use true in dev only!
+    // }),
     ConfigModule.forRoot(),
   ],
   controllers: [AppController],
