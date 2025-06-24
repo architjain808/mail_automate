@@ -17,4 +17,8 @@ export class AppController {
   addNewUser(@Body() body: AddUserDto) {
     return this.userService.addUser(body);
   }
+  @Get('ping')
+  getPing() {
+    return { message: 'pong' };
+  }
 }
