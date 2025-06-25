@@ -22,8 +22,8 @@ export class UserManageService {
     rawData.push({
       useremail: userdata?.user_email,
       appPassword: this.aesService.encrypt(userdata?.user_app_password),
-      subject: userdata?.user_email,
-      text: userdata?.user_email,
+      subject: userdata?.mail_subject,
+      text: userdata?.mail_text,
       mailIndex: 0,
     });
     fs.writeFileSync('./src/Data/users.json', JSON.stringify(rawData));

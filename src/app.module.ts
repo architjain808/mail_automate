@@ -6,6 +6,7 @@ import { MailService } from './services/mail.service';
 import { ConfigModule } from '@nestjs/config';
 import { UserManageService } from './services/usermanage.service';
 import { AesService } from './services/enc-dec.service';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { AesService } from './services/enc-dec.service';
     //   synchronize: true, // use true in dev only!
     // }),
     ConfigModule.forRoot(),
+    ScheduleModule.forRoot()
   ],
   controllers: [AppController],
   providers: [AppService, MailService, UserManageService, AesService],
