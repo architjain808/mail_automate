@@ -7,17 +7,33 @@ import { Recruiter } from 'src/interface/recruiter';
 import { console } from 'inspector';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { AesService } from './enc-dec.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { UserRegisterEntity } from 'src/entities/UserRegister.entity';
+import { Repository } from 'typeorm';
 @Injectable()
 export class MailService {
   private readonly logger = new Logger(MailService.name);
 
-  constructor(private aesService: AesService) {}
+  constructor(
+    private aesService: AesService,
+    @InjectRepository(UserRegisterEntity)
+    private readonly userRepo: Repository<UserRegisterEntity>,
+  ) {}
 
-  @Cron(CronExpression.MONDAY_TO_FRIDAY_AT_6AM)
+  @Cron(CronExpression.MONDAY_TO_FRIDAY_AT_7AM)
   async handleEmailSend() {
-    const allUsers: Users[] = JSON.parse(
-      fs.readFileSync('./src/Data/users.json', 'utf-8'),
-    );
+    // const allUsers: Users[] = JSON.parse(
+    //   fs.readFileSync('./src/Data/users.json', 'utf-8'),
+    // );
+    let allUsers: any = [];
+    await this.userRepo
+      .find()
+      .then((res) => {
+        allUsers = res;
+      })
+      .catch((err) => {
+        this.logger.error(err);
+      });
     const allRecuretors: Recruiter[] = JSON.parse(
       fs.readFileSync('./src/Data/allmails.json', 'utf-8'),
     );
@@ -27,8 +43,7 @@ export class MailService {
       const filteredList = allRecuretors.filter(
         (rec) => rec?.index > mailStatingIndex,
       );
-      const finalMailArray = filteredList.splice(0, 20);
-      const pass = this.aesService.decrypt(user?.appPassword);
+      const finalMailArray = filteredList.splice(0, 30);
       const userTranspoter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
@@ -37,12 +52,7 @@ export class MailService {
         },
       });
       await this.sendEmailsOneByOne(user, userTranspoter, finalMailArray);
-      this.updateUserFile(
-        './src/Data/users.json',
-        user?.useremail,
-        'mailIndex',
-        +user?.mailIndex + 20,
-      );
+      await this.updateUserFile(user, 'mailIndex', +user?.mailIndex + 30);
     }
   }
 
@@ -69,7 +79,7 @@ export class MailService {
           err.message,
         );
       }
-      this.sleep(3000);
+      await this.sleep(3000);
     }
   }
 
@@ -85,14 +95,9 @@ export class MailService {
       .replace(/\$\{contact\.companyName\}/g, contact.companyName);
   }
 
-  updateUserFile(filePath, useremail, key, newValue) {
-    const rawData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-    const item = rawData.find((obj: Users) => obj.useremail === useremail);
-    if (item) {
-      item[key] = newValue;
-
-      fs.writeFileSync(filePath, JSON.stringify(rawData));
-    }
+  updateUserFile(userData, key, newValue) {
+    const new_userData = { ...userData, [key]: newValue };
+    return this.userRepo.update(userData?.user_id, new_userData);
   }
   private sleep(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
