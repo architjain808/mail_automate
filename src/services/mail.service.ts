@@ -13,7 +13,7 @@ export class MailService {
 
   constructor(private aesService: AesService) {}
 
-  @Cron(CronExpression.MONDAY_TO_FRIDAY_AT_12PM)
+  @Cron(CronExpression.MONDAY_TO_FRIDAY_AT_6AM)
   async handleEmailSend() {
     const allUsers: Users[] = JSON.parse(
       fs.readFileSync('./src/Data/users.json', 'utf-8'),
@@ -27,7 +27,8 @@ export class MailService {
       const filteredList = allRecuretors.filter(
         (rec) => rec?.index > mailStatingIndex,
       );
-      const finalMailArray = filteredList.splice(0, 25);
+      const finalMailArray = filteredList.splice(0, 20);
+      const pass = this.aesService.decrypt(user?.appPassword);
       const userTranspoter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
@@ -40,8 +41,7 @@ export class MailService {
         './src/Data/users.json',
         user?.useremail,
         'mailIndex',
-        +user?.mailIndex + 25,
-        
+        +user?.mailIndex + 20,
       );
     }
   }
