@@ -20,7 +20,7 @@ export class MailService {
     private readonly userRepo: Repository<UserRegisterEntity>,
   ) {}
 
-  @Cron(CronExpression.MONDAY_TO_FRIDAY_AT_7AM)
+  @Cron(CronExpression.MONDAY_TO_FRIDAY_AT_9AM)
   async handleEmailSend() {
     // const allUsers: Users[] = JSON.parse(
     //   fs.readFileSync('./src/Data/users.json', 'utf-8'),
